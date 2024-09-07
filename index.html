@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Cards Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea, .output {
+            width: 100%;
+            min-height: 150px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .output {
+            background-color: #e8e8e8;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Text to Cards Converter</h1>
+
+    <h3>Input Text:</h3>
+    <textarea id="textInput" placeholder="Enter your text here..."></textarea>
+
+    <button onclick="convertToCards()">Convert to Cards</button>
+    <button onclick="convertToText()">Convert to Text</button>
+
+    <h3>Output:</h3>
+    <div class="output" id="output"></div>
+</div>
+
+<script>
+    const cards = {
+        'A': '🂱', 'B': '🂲', 'C': '🂳', 'D': '🂴', 'E': '🂵', 'F': '🂶', 'G': '🂷', 'H': '🂸', 'I': '🂹', 'J': '🂺', 'K': '🂻', 'L': '🂼', 'M': '🂽',  // Hearts
+        'N': '🃁', 'O': '🃂', 'P': '🃃', 'Q': '🃄', 'R': '🃅', 'S': '🃆', 'T': '🃇', 'U': '🃈', 'V': '🃉', 'W': '🃊', 'X': '🃋', 'Y': '🃌', 'Z': '🃍',  // Diamonds
+        'a': '🂡', 'b': '🂢', 'c': '🂣', 'd': '🂤', 'e': '🂥', 'f': '🂦', 'g': '🂧', 'h': '🂨', 'i': '🂩', 'j': '🂪', 'k': '🂫', 'l': '🂬', 'm': '🂭',  // Spades
+        'n': '🃑', 'o': '🃒', 'p': '🃓', 'q': '🃔', 'r': '🃕', 's': '🃖', 't': '🃗', 'u': '🃘', 'v': '🃙', 'w': '🃚', 'x': '🃛', 'y': '🃜', 'z': '🃝'   // Clubs
+    };
+
+    const reverseCards = Object.fromEntries(Object.entries(cards).map(([k, v]) => [v, k]));
+
+    function convertToCards() {
+        const inputText = document.getElementById("textInput").value;
+        let result = '';
+        for (let char of inputText) {
+            result += cards[char] || char;  // Преобразование символов или оставляем как есть
+        }
+        document.getElementById("output").textContent = result;
+    }
+
+    function convertToText() {
+        const cardText = document.getElementById("textInput").value;
+        let result = '';
+        for (let char of cardText) {
+            result += reverseCards[char] || char;  // Обратное преобразование карт в текст или оставляем как есть
+        }
+        document.getElementById("output").textContent = result;
+    }
+</script>
+
+</body>
+</html>
