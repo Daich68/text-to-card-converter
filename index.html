@@ -3,35 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Text to Cards Converter</title>
-  <!-- Подключение шрифта Roboto для современного внешнего вида -->
+    <title>Text to Cards Converter</title>
+  <!-- Подключение шрифтов и иконок -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🂱</text></svg>">
+  
   <style>
     /* Тёмная тема (по умолчанию) */
     :root {
-      --bg-primary: #1c1c1c;
-      --bg-terminal: #252525;
+      --bg-primary: #121212;
+      --bg-terminal: #1e1e1e;
       --text-primary: #ffffff;
       --text-secondary: #a0a0a0;
       --accent: #4d9375;
+      --accent-hover: #3d7a5f;
       --border-color: #333;
       --input-bg: #2a2a2a;
-      --toolbar-bg: rgba(45, 45, 45, 0.95);
+      --toolbar-bg: rgba(30, 30, 30, 0.95);
       --button-hover-bg: #3a3a3a;
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      --card-glow: 0 0 15px rgba(77, 147, 117, 0.5);
     }
     /* Светлая тема */
     [data-theme="light"] {
-      --bg-primary: #f5f5f5;
+      --bg-primary: #f0f0f0;
       --bg-terminal: #ffffff;
-      --text-primary: #000000;
-      --text-secondary: #555555;
+      --text-primary: #333333;
+      --text-secondary: #666666;
       --accent: #4d9375;
-      --border-color: #ccc;
+      --accent-hover: #3d7a5f;
+      --border-color: #e0e0e0;
       --input-bg: #ffffff;
-      --toolbar-bg: rgba(240, 240, 240, 0.95);
-      --button-hover-bg: #e0e0e0;
+      --toolbar-bg: rgba(255, 255, 255, 0.95);
+      --button-hover-bg: #f0f0f0;
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --card-glow: 0 0 15px rgba(77, 147, 117, 0.3);
     }
     * {
       margin: 0;
@@ -45,62 +54,84 @@
       line-height: 1.5;
       min-height: 100vh;
       padding: 1rem;
+      transition: background 0.3s ease, color 0.3s ease;
     }
     .terminal {
       background: var(--bg-terminal);
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
       max-width: 1200px;
       margin: 0 auto;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       border: 1px solid var(--border-color);
+      transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     }
     /* Шапка */
     header.toolbar {
       background: var(--toolbar-bg);
-      padding: 0.75rem 1rem;
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border-color);
       backdrop-filter: blur(10px);
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
     .toolbar-title {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    .toolbar-title i {
+      color: var(--accent);
     }
     .toolbar-actions {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     .toolbar-button {
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
-      padding: 0.35rem 0.75rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
     }
     .toolbar-button:hover {
       background: var(--button-hover-bg);
       color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .toolbar-button:active {
+      transform: translateY(0);
     }
     /* Рабочая область */
     main.workspace {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1px;
+      gap: 2px;
       background: var(--border-color);
-      height: calc(100vh - 150px);
-      min-height: 400px;
+      height: calc(100vh - 170px);
+      min-height: 450px;
+      transition: background 0.3s ease;
     }
     @media (max-width: 768px) {
       main.workspace {
         grid-template-columns: 1fr;
         height: auto;
+      }
+      .panel {
+        min-height: 350px;
       }
     }
     .panel {
@@ -108,50 +139,90 @@
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
+      transition: background 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .panel:hover::after {
+      opacity: 1;
     }
     .panel-header {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     .panel-header h2 {
-      font-size: 0.9rem;
+      font-size: 1rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      font-weight: 500;
+      color: var(--accent);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
     }
     .input-controls, .output-controls {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
     .conversion-mode {
       border: 1px solid var(--border-color);
-      padding: 0.5rem;
-      border-radius: 4px;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: var(--input-bg);
+      transition: border-color 0.3s ease, background 0.3s ease;
     }
     .conversion-mode legend {
-      font-size: 0.8rem;
-      padding: 0 0.25rem;
-      color: var(--text-secondary);
+      font-size: 0.85rem;
+      padding: 0 0.5rem;
+      color: var(--accent);
+      font-weight: 500;
+      transition: color 0.3s ease;
     }
     .conversion-mode label {
-      font-size: 0.8rem;
-      margin-right: 0.5rem;
+      font-size: 0.9rem;
+      margin-right: 0.75rem;
       color: var(--text-secondary);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.3s ease;
+    }
+    .conversion-mode label:hover {
+      color: var(--text-primary);
     }
     .auto-convert-label {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .auto-convert-label:hover {
+      color: var(--text-primary);
+    }
+    input[type="radio"], input[type="checkbox"] {
+      accent-color: var(--accent);
       cursor: pointer;
     }
     textarea,
@@ -159,100 +230,219 @@
       flex: 1;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 1rem;
+      border-radius: 10px;
+      padding: 1.25rem;
       color: var(--text-primary);
       font-family: 'Roboto Mono', monospace;
-      font-size: 0.9rem;
+      font-size: 1rem;
       resize: none;
-      min-height: 150px;
+      min-height: 180px;
+      transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+      line-height: 1.6;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(77, 147, 117, 0.2);
     }
     .output-display {
       white-space: pre-wrap;
       overflow-y: auto;
-      transition: opacity 0.3s ease;
+      transition: all 0.3s ease;
     }
     .output-display.fade {
       opacity: 0;
-      animation: fadeIn 0.3s forwards;
+      transform: translateY(10px);
+      animation: fadeInUp 0.4s forwards;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(10px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      }
     }
-    .convert-button {
+    .card-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      justify-content: center;
+      max-height: 100px;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border-radius: 8px;
+      background: var(--bg-primary);
+      transition: background 0.3s ease;
+    }
+    .card {
+      font-size: 2rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card:hover {
+      transform: translateY(-5px) scale(1.1);
+      text-shadow: var(--card-glow);
+    }
+    .button {
       background: var(--accent);
       color: white;
       border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 500;
-      transition: opacity 0.2s, background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    .convert-button:hover {
-      opacity: 0.9;
+    .button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    .button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .button.secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    .button.secondary:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+      background: rgba(77, 147, 117, 0.1);
+    }
+    .manual-convert {
+      text-align: center;
     }
     /* Статус-бар */
     footer.status-bar {
       background: var(--toolbar-bg);
-      padding: 0.5rem 1rem;
+      padding: 0.75rem 1.5rem;
       border-top: 1px solid var(--border-color);
       font-size: 0.8rem;
       color: var(--text-secondary);
       display: flex;
       justify-content: space-between;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    
+    /* Адаптивность для мобильных устройств */
+    @media (max-width: 576px) {
+      .toolbar-title {
+        font-size: 1rem;
+      }
+      .button-text, .theme-text {
+        display: none;
+      }
+      .toolbar-button {
+        padding: 0.5rem;
+      }
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .panel-header h2 {
+        margin-bottom: 0.5rem;
+      }
+      .input-controls, .output-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .conversion-mode {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+      .conversion-mode label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      .status-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+    }
+    
+    /* Анимации при наведении и фокусе */
+    .panel:focus-within::after {
+      opacity: 1;
+    }
+    
+    /* Улучшенная доступность */
+    :focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    
+    /* Плавные переходы для всех элементов */
+    * {
+      transition-property: background-color, border-color, color, box-shadow, transform, opacity;
+      transition-duration: 0.3s;
+      transition-timing-function: ease;
     }
   </style>
 </head>
 <body>
   <div class="terminal">
     <header class="toolbar">
-      <div class="toolbar-title">Text to Cards Converter</div>
+      <div class="toolbar-title"><i class="fas fa-cards">🂱</i> Text to Cards Converter</div>
       <div class="toolbar-actions">
-        <button id="themeToggleBtn" class="toolbar-button" aria-label="Toggle Theme">Switch Theme</button>
+        <button id="themeToggleBtn" class="toolbar-button" aria-label="Toggle Theme"><i class="fas fa-moon"></i> <span class="theme-text">Сменить тему</span></button>
+        <button id="helpBtn" class="toolbar-button" aria-label="Help"><i class="fas fa-question-circle"></i> <span class="button-text">Помощь</span></button>
       </div>
     </header>
     <main class="workspace">
       <!-- Панель ввода -->
       <section class="panel" id="inputPanel">
         <div class="panel-header">
-          <h2>Input</h2>
+          <h2><i class="fas fa-keyboard"></i> Ввод</h2>
           <div class="input-controls">
             <fieldset class="conversion-mode">
-              <legend>Conversion Mode</legend>
-              <label><input type="radio" name="mode" value="toCards" checked> Text to Cards</label>
-              <label><input type="radio" name="mode" value="toText"> Cards to Text</label>
+              <legend>Режим конвертации</legend>
+              <label><input type="radio" name="mode" value="toCards" checked> <i class="fas fa-font"></i> Текст в карты</label>
+              <label><input type="radio" name="mode" value="toText"> <i class="fas fa-cards"></i> Карты в текст</label>
             </fieldset>
             <label class="auto-convert-label">
-              <input type="checkbox" id="autoConvert"> Auto Convert
+              <input type="checkbox" id="autoConvert"> Автоконвертация
             </label>
-            <button id="clearBtn" class="convert-button">Clear</button>
+            <button id="clearBtn" class="button secondary"><i class="fas fa-trash"></i> Очистить</button>
           </div>
         </div>
-        <textarea id="textInput" placeholder="Enter your text here..." aria-label="Input Text"></textarea>
-        <div class="manual-convert" style="text-align: center;">
-          <button id="convertBtn" class="convert-button">Convert</button>
+        <textarea id="textInput" placeholder="Введите ваш текст здесь..." aria-label="Input Text"></textarea>
+        <div id="cardPreviewInput" class="card-preview"></div>
+        <div class="manual-convert">
+          <button id="convertBtn" class="button"><i class="fas fa-exchange-alt"></i> Конвертировать</button>
         </div>
       </section>
       <!-- Панель вывода -->
       <section class="panel" id="outputPanel">
         <div class="panel-header">
-          <h2>Output</h2>
+          <h2><i class="fas fa-file-alt"></i> Вывод</h2>
           <div class="output-controls">
-            <button id="swapBtn" class="convert-button">Swap</button>
-            <button id="copyOutputBtn" class="convert-button">Copy</button>
-            <button id="downloadBtn" class="convert-button">Download</button>
+            <button id="swapBtn" class="button secondary"><i class="fas fa-sync"></i> Поменять</button>
+            <button id="copyOutputBtn" class="button secondary"><i class="fas fa-copy"></i> Копировать</button>
+            <button id="downloadBtn" class="button secondary"><i class="fas fa-download"></i> Скачать</button>
           </div>
         </div>
         <div class="output-display" id="output" aria-live="polite"></div>
+        <div id="cardPreviewOutput" class="card-preview"></div>
       </section>
     </main>
     <footer class="status-bar">
-      <div id="statusMessage">Ready</div>
+      <div id="statusMessage">Готово</div>
       <div>
-        Cards: <span id="cardCount">0</span> | Characters: <span id="charCount">0</span>
+        Карт: <span id="cardCount">0</span> | Символов: <span id="charCount">0</span>
       </div>
     </footer>
   </div>
@@ -284,6 +474,9 @@
       const copyOutputBtn = document.getElementById("copyOutputBtn");
       const downloadBtn = document.getElementById("downloadBtn");
       const themeToggleBtn = document.getElementById("themeToggleBtn");
+      const helpBtn = document.getElementById("helpBtn");
+      const cardPreviewInput = document.getElementById("cardPreviewInput");
+      const cardPreviewOutput = document.getElementById("cardPreviewOutput");
 
       // Получаем выбранный режим конвертации (radio)
       const modeRadios = document.querySelectorAll('input[name="mode"]');
@@ -296,32 +489,95 @@
         charCountSpan.textContent = charCount;
       }
 
-      // Функция установки статуса
+      // Функция установки статуса с анимацией
       function setStatus(message, timeout = 3000) {
-        statusMessage.textContent = message;
-        if (timeout) {
-          setTimeout(() => {
-            statusMessage.textContent = "Ready";
-          }, timeout);
+        statusMessage.style.opacity = '0';
+        setTimeout(() => {
+          statusMessage.textContent = message;
+          statusMessage.style.opacity = '1';
+          if (timeout) {
+            setTimeout(() => {
+              statusMessage.style.opacity = '0';
+              setTimeout(() => {
+                statusMessage.textContent = "Готово";
+                statusMessage.style.opacity = '1';
+              }, 300);
+            }, timeout);
+          }
+        }, 300);
+      }
+
+      // Функция для обновления предпросмотра карт
+      function updateCardPreview(text, previewElement) {
+        previewElement.innerHTML = '';
+        const uniqueCards = new Set();
+        
+        // Собираем уникальные карты из текста
+        for (let char of text) {
+          if (Object.values(cards).includes(char)) {
+            uniqueCards.add(char);
+          } else if (cards[char]) {
+            uniqueCards.add(cards[char]);
+          }
         }
+        
+        // Если карт нет, скрываем предпросмотр
+        if (uniqueCards.size === 0) {
+          previewElement.style.display = 'none';
+          return;
+        }
+        
+        // Показываем предпросмотр и добавляем карты
+        previewElement.style.display = 'flex';
+        uniqueCards.forEach(card => {
+          const cardElement = document.createElement('span');
+          cardElement.className = 'card';
+          cardElement.textContent = card;
+          cardElement.title = reverseCards[card] || card;
+          
+          // Добавляем анимацию появления
+          cardElement.style.opacity = '0';
+          cardElement.style.transform = 'scale(0.8)';
+          
+          previewElement.appendChild(cardElement);
+          
+          // Запускаем анимацию с небольшой задержкой
+          setTimeout(() => {
+            cardElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            cardElement.style.opacity = '1';
+            cardElement.style.transform = 'scale(1)';
+          }, 50 * previewElement.children.length);
+        });
       }
 
       // Функция конвертации в зависимости от выбранного режима
       function convert() {
         const inputText = textInput.value;
+        if (!inputText.trim()) {
+          outputDisplay.textContent = "";
+          cardPreviewOutput.innerHTML = "";
+          cardPreviewOutput.style.display = 'none';
+          updateCounts("");
+          return;
+        }
+        
         let result = "";
         const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+        
         if (selectedMode === "toCards") {
           for (let char of inputText) {
             result += cards[char] || char;
           }
-          setStatus("Converted text to cards.");
+          setStatus("Текст конвертирован в карты.");
+          updateCardPreview(result, cardPreviewOutput);
         } else {
           for (let char of inputText) {
             result += reverseCards[char] || char;
           }
-          setStatus("Converted cards to text.");
+          setStatus("Карты конвертированы в текст.");
+          updateCardPreview(inputText, cardPreviewOutput);
         }
+        
         // Анимация появления результата
         outputDisplay.classList.remove("fade");
         void outputDisplay.offsetWidth; // перезапуск анимации
@@ -330,14 +586,181 @@
         updateCounts(result);
       }
 
+      // Функция для отображения модального окна с помощью
+      function showHelp() {
+        // Создаем модальное окно
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3><i class="fas fa-question-circle"></i> Помощь</h3>
+              <button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+              <h4>О приложении</h4>
+              <p>Text to Cards Converter позволяет конвертировать текст в игральные карты и обратно, используя специальные символы Unicode.</p>
+              
+              <h4>Как использовать</h4>
+              <ol>
+                <li>Выберите режим конвертации: «Текст в карты» или «Карты в текст».</li>
+                <li>Введите текст в поле ввода.</li>
+                <li>Нажмите кнопку «Конвертировать» или включите «Автоконвертацию».</li>
+                <li>Результат появится в поле вывода.</li>
+              </ol>
+              
+              <h4>Дополнительные функции</h4>
+              <ul>
+                <li><strong>Поменять</strong> — меняет местами содержимое полей ввода и вывода.</li>
+                <li><strong>Копировать</strong> — копирует результат в буфер обмена.</li>
+                <li><strong>Скачать</strong> — сохраняет результат в текстовый файл.</li>
+                <li><strong>Сменить тему</strong> — переключает между светлой и темной темами.</li>
+              </ul>
+              
+              <h4>Соответствие символов</h4>
+              <p>Каждая буква латинского алфавита (A-Z, a-z) соответствует определенной игральной карте.</p>
+              <div class="card-examples">
+                <div><span class="card">🂱</span> = A</div>
+                <div><span class="card">🂡</span> = a</div>
+                <div><span class="card">🃂</span> = O</div>
+                <div><span class="card">🃗</span> = t</div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Добавляем стили для модального окна
+        const style = document.createElement('style');
+        style.textContent = `
+          .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          }
+          .modal-content {
+            background: var(--bg-terminal);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+          }
+          .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .modal-header h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .close-button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+          }
+          .close-button:hover {
+            color: var(--text-primary);
+          }
+          .modal-body {
+            padding: 1.5rem;
+            color: var(--text-primary);
+          }
+          .modal-body h4 {
+            color: var(--accent);
+            margin: 1.5rem 0 0.75rem;
+            font-size: 1.1rem;
+          }
+          .modal-body h4:first-child {
+            margin-top: 0;
+          }
+          .modal-body p, .modal-body li {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+          }
+          .modal-body ul, .modal-body ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+          }
+          .card-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+          }
+          .card-examples div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+          }
+          .card-examples .card {
+            font-size: 2rem;
+          }
+        `;
+        document.head.appendChild(style);
+        
+        // Анимация появления
+        setTimeout(() => {
+          modal.style.opacity = '1';
+          modal.querySelector('.modal-content').style.transform = 'translateY(0)';
+        }, 10);
+        
+        // Закрытие модального окна
+        const closeModal = () => {
+          modal.style.opacity = '0';
+          modal.querySelector('.modal-content').style.transform = 'translateY(-20px)';
+          setTimeout(() => {
+            document.body.removeChild(modal);
+            document.head.removeChild(style);
+          }, 300);
+        };
+        
+        modal.querySelector('.close-button').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal();
+        });
+      }
+
       // Привязка событий
       convertBtn.addEventListener("click", convert);
 
       textInput.addEventListener("input", () => {
+        const inputText = textInput.value;
+        updateCardPreview(inputText, cardPreviewInput);
+        
         if (autoConvertCheckbox.checked) {
           convert();
         } else {
           outputDisplay.textContent = "";
+          cardPreviewOutput.innerHTML = "";
+          cardPreviewOutput.style.display = 'none';
           updateCounts("");
         }
       });
@@ -345,15 +768,24 @@
       clearBtn.addEventListener("click", () => {
         textInput.value = "";
         outputDisplay.textContent = "";
+        cardPreviewInput.innerHTML = "";
+        cardPreviewInput.style.display = 'none';
+        cardPreviewOutput.innerHTML = "";
+        cardPreviewOutput.style.display = 'none';
         updateCounts("");
-        setStatus("Cleared.");
+        setStatus("Очищено.");
       });
 
       swapBtn.addEventListener("click", () => {
         const temp = textInput.value;
         textInput.value = outputDisplay.textContent;
         outputDisplay.textContent = temp;
-        setStatus("Swapped input and output.");
+        
+        // Обновляем предпросмотры
+        updateCardPreview(textInput.value, cardPreviewInput);
+        updateCardPreview(outputDisplay.textContent, cardPreviewOutput);
+        
+        setStatus("Содержимое полей поменяно местами.");
         if (autoConvertCheckbox.checked) {
           convert();
         }
@@ -363,8 +795,8 @@
         const text = outputDisplay.textContent;
         if (!text) return;
         navigator.clipboard.writeText(text)
-          .then(() => setStatus("Output copied to clipboard."))
-          .catch(() => setStatus("Failed to copy output.", 5000));
+          .then(() => setStatus("Результат скопирован в буфер обмена."))
+          .catch(() => setStatus("Не удалось скопировать результат.", 5000));
       });
 
       downloadBtn.addEventListener("click", () => {
@@ -379,15 +811,44 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        setStatus("Downloaded output as output.txt.");
+        setStatus("Результат сохранен как output.txt.");
       });
 
       themeToggleBtn.addEventListener("click", () => {
         const currentTheme = document.documentElement.getAttribute("data-theme");
         const newTheme = currentTheme === "dark" ? "light" : "dark";
         document.documentElement.setAttribute("data-theme", newTheme);
-        setStatus(`Switched to ${newTheme} theme.`);
+        
+        // Обновляем иконку и текст кнопки
+        const themeIcon = themeToggleBtn.querySelector('i');
+        const themeText = themeToggleBtn.querySelector('.theme-text');
+        
+        if (newTheme === "dark") {
+          themeIcon.className = "fas fa-moon";
+          setStatus("Переключено на темную тему.");
+        } else {
+          themeIcon.className = "fas fa-sun";
+          setStatus("Переключено на светлую тему.");
+        }
       });
+
+      // Обработчик для кнопки помощи
+      helpBtn.addEventListener("click", showHelp);
+
+      // Инициализация темы при загрузке
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const themeIcon = themeToggleBtn.querySelector('i');
+      
+      if (currentTheme === "light") {
+        themeIcon.className = "fas fa-sun";
+      }
+
+      // Добавляем стили для анимации статуса
+      statusMessage.style.transition = 'opacity 0.3s ease';
+
+      // Инициализация предпросмотра карт
+      cardPreviewInput.style.display = 'none';
+      cardPreviewOutput.style.display = 'none';
     });
   </script>
 </body>
